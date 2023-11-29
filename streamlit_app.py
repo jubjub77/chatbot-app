@@ -6,8 +6,6 @@ from langchain.vectorstores import Chroma
 from langchain.chains import RetrievalQA
 
 
-
-
 st.set_page_config(page_title='🦜 Pearson Career Coach App')
 st.title('🦜 Welcome to Pearsonify, your personal career coach')
 
