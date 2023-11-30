@@ -3,7 +3,6 @@ import os
 import streamlit as st
 from decouple import config
 
-
 from langchain.chains import RetrievalQA
 from langchain.vectorstores import Chroma
 from langchain.chat_models import ChatOpenAI
