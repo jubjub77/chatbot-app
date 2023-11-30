@@ -1,89 +1,40 @@
-import os
-
+import openai
 import streamlit as st
-from decouple import config
+import toml
 
-from langchain.chains import RetrievalQA
-from langchain.vectorstores import Chroma
-from langchain.chat_models import ChatOpenAI
-import chromadb
-from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddings
-from langchain.prompts import PromptTemplate
-from langchain.chains import LLMChain
+secrets = toml.load("streamlit/secrets.toml")
 
+st.title("Chat Bot (GPT-3.5)")
 
-st.set_page_config(page_title="Chat With YT", layout="centered")
-st.title("Chat With YouTube Video")
+openai.api_key = secrets["OPENAI_API_KEY"]
 
-# set API key
-os.environ["OPENAI_API_KEY"] = config("OPENAI_API_KEY")
+if "openai_model" not in st.session_state:
+    st.session_state["openai_model"] = "gpt-3.5-turbo"
 
-persistent_client = chromadb.PersistentClient(path="./vector_store_003")
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-# embedding function
-embedding_function = SentenceTransformerEmbeddings(
-    model_name="all-MiniLM-L6-v2"
-)
-
-vectordb = Chroma(
-    embedding_function=embedding_function,
-    persist_directory="./vector_store_003",
-    collection_name="david_gogginc_short"
-)
-
-prompt = PromptTemplate(
-    template="""Given the context of about a video. Answer the user in a friendly and precise manner.
-    
-    Context: {context}
-    
-    Human: {question}
-    
-    AI:""",
-    input_variables=["context", "question"]
-)
-
-# set initial message
-if "messages" not in st.session_state.keys():
-    st.session_state.messages = [
-        {"role": "assistant", "content": "Hello there, how can I help you"}
-    ]
-
-qa_chain = RetrievalQA.from_chain_type(
-    llm=ChatOpenAI(
-        temperature=0.6
-    ),
-    chain_type="stuff",
-    retriever=vectordb.as_retriever(),
-    return_source_documents=True,
-    chain_type_kwargs={
-        "prompt": prompt
-    }
-)
-
-# display messages
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
-        st.write(message["content"])
+        st.markdown(message["content"])
 
-# get user input
-user_prompt = st.chat_input()
-
-if user_prompt is not None:
-    st.session_state.messages.append({"role": "user", "content": user_prompt})
+if prompt := st.chat_input("What is up?"):
+    st.session_state.messages.append({"role": "user", "content": prompt})
     with st.chat_message("user"):
-        st.write(user_prompt)
+        st.markdown(prompt)
 
-
-if st.session_state.messages[-1]["role"] != "assistant":
     with st.chat_message("assistant"):
-        with st.spinner("Loading..."):
-            ai_response = qa_chain(
-                {"query": user_prompt}
-            )
-            st.write(ai_response["result"])
-
-            for doc in ai_response["source_documents"]:
-                st.write(doc)
-
-    new_ai_message = {"role": "user", "content": ai_response}
-    st.session_state.messages.append(new_ai_message)
+        message_placeholder = st.empty()
+        full_response = ""
+        for response in openai.ChatCompletion.create(
+            model=st.session_state["openai_model"],
+            messages=[
+                {"role": m["role"], "content": m["content"]}
+                for m in st.session_state.messages
+            ],
+            stream=True,
+        ):
+            full_response += response.choices[0].delta.get("content", "")
+            message_placeholder.markdown(full_response + "▌")
+        message_placeholder.markdown(full_response)
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
