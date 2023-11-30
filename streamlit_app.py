@@ -31,10 +31,10 @@ st.title('🦜 Welcome to Pearsonify, your personal career coach')
 
 
 ## a good place to start is with a CV
-uploaded_file = st.file_uploader('To help your career coach get a quick snapshot of your career history, why not upload a resume? Load pdf version of your linkedin profile or resume ', type='pdf')
+uploaded_file = st.file_uploader('To help your career coach get a quick snapshot of your career history, why not upload a resume? Load a pdf version of your linkedin profile or resume ', type='pdf')
 
 ## query
-query_text = st.text_input('Query:', placeholder = 'Enter your query here', disabled=not uploaded_file)
+query_text = st.text_input('Let\'s talk:', placeholder = 'Enter your thoughts here', disabled=not uploaded_file)
 
 #st.write('Hello world!')
 
