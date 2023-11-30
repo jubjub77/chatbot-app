@@ -38,7 +38,6 @@ query_text = st.text_input('Let\'s talk:', placeholder = 'Enter your thoughts he
 
 #st.write('Hello world!')
 
-
 # Form input and query
 result = []
 with st.form('myform', clear_on_submit=True):
