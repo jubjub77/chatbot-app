@@ -9,7 +9,7 @@ from langchain.document_loaders.image import UnstructuredImageLoader
 from langchain.document_loaders import ImageCaptionLoader
 from langchain.docstore.document import Document
 import os
-import pytube
+#import pytube
 import openai
 
 # Chat UI title
