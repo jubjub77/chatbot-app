@@ -21,7 +21,7 @@ def generate_response(uploaded_file, openai_api_key, query_text):
     # Create retriever interface
     retriever = db.as_retriever()
     # Create QA chain
-    qa = RetrievalQA.from_chain_type(llm=OpenAI(openai_api_key=openai_api_key), chain_type='stuff', retriever=retriever)
+    qa = RetrievalQA.from_chain_type(llm=openai(openai_api_key=openai_api_key), chain_type='stuff', retriever=retriever)
     return qa.run(query_text)
 
 
@@ -34,7 +34,7 @@ st.title('🦜 Welcome to Pearsonify, your personal career coach')
 uploaded_file = st.file_uploader('To help your career coach get a quick snapshot of your career history, why not upload a resume? Load a pdf version of your linkedin profile or resume ', type='pdf')
 
 ## query
-query_text = st.text_input('Let\'s talk:', placeholder = 'Enter your thoughts here', disabled=not uploaded_file)
+query_text = st.text_input('Let\'s talk:', placeholder = 'Enter your thoughts here')
 
 #st.write('Hello world!')
 
